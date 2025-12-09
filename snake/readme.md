@@ -7,6 +7,11 @@ Runs directly inside the interface with smooth controls, instant restarts, and c
 
 ---
 
+## 🚀 Get started
+1. Go to your open-webui **Workspace** then click on the **Tools** tab
+2. Click on **New Tool** then **Import From Link**
+3. Paste this url https://github.com/Helmi97/open-webui-extensions/blob/main/snake/snake.py then click **Import**
+---
 ## 🕹️ Gameplay
 ![Gameplay](./Screenshot%20Gameplay.png)
 
