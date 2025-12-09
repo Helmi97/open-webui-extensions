@@ -4,7 +4,7 @@ A lightweight, fast, and fully configurable Snake game built as an **OpenWebUI t
 Runs directly inside the interface with smooth controls, instant restarts, and customizable difficulty.
 
 🎥 **Demo Video:**  
-https://github.com/your-repo/snake-mini-game/raw/main/Screen%20Recording.mp4
+https://github.com/Helmi97/open-webui-extensions/tree/main/snake/raw/main/Screen%20Recording.mp4
 
 ---
 
