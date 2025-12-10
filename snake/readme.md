@@ -12,12 +12,6 @@ Runs directly inside the interface with smooth controls, instant restarts, and c
 2. Click on **New Tool** then **Import From Link**
 3. Paste this url https://github.com/Helmi97/open-webui-extensions/blob/main/snake/snake.py then click **Import**
 ---
-## 🕹️ Gameplay
-![Gameplay](./Screenshot%20Gameplay.png)
-
-Move using **W A S D**, pause using **space**, avoid your tail, collect food, and climb the score counter.
-
----
 
 ## 🧩 Valves (Tool Configuration)
 ![Valves](./Screenshot%20Valves.png)
@@ -33,6 +27,13 @@ These parameters can be tuned directly from OpenWebUI’s tool settings:
 | `cell_size`  | int     | Pixel size per grid cell. |
 | `save_scores`| boolean | Store best score in localStorage. |
 | `difficulty` | enum    | Base speed preset (`easy`, `normal`, `hard`). |
+
+---
+
+## 🕹️ Gameplay
+![Gameplay](./Screenshot%20Gameplay.png)
+
+Move using **W A S D**, pause using **space**, avoid your tail, collect food, and climb the score counter.
 
 ---
 
