@@ -13,7 +13,7 @@ Runs directly inside the interface with smooth controls, instant restarts, and c
 3. Paste this url https://github.com/Helmi97/open-webui-extensions/blob/main/snake/snake.py then click **Import**
 ---
 
-## 🧩 Valves (Tool Configuration)
+## ⚙️ Valves (Tool Configuration)
 ![Valves](./Screenshot%20Valves.png)
 
 These parameters can be tuned directly from OpenWebUI’s tool settings:
@@ -30,14 +30,14 @@ These parameters can be tuned directly from OpenWebUI’s tool settings:
 
 ---
 
-## 🕹️ Gameplay
+## 🎮 Gameplay
 ![Gameplay](./Screenshot%20Gameplay.png)
 
 Move using **W A S D**, pause using **space**, avoid your tail, collect food, and climb the score counter.
 
 ---
 
-## ⚙️ In-Game Settings Modal
+## 🛠 In-Game Settings 
 ![Settings](./Screenshot%20Settings.png)
 
 Open the small **⚙️ gear icon** to tweak settings mid-session:
