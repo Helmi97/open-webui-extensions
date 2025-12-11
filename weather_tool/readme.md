@@ -1,4 +1,4 @@
-# Weather Tool
+# 🌤️ Weather Tool
 
 Enhanced weather tool for Open WebUI that shows a **modern responsive widget** for current conditions and a **multi day forecast**, powered by [Open-Meteo](https://open-meteo.com) (no API key needed).
 
