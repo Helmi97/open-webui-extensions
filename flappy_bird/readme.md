@@ -10,7 +10,7 @@ Tap, flap, dodge the pipes, and chase a high score without leaving your chat.
 ## 🚀 Get started
 1. Go to your open-webui **Workspace** then click on the **Tools** tab
 2. Click on **New Tool** then **Import From Link**
-3. Paste this url https://github.com/Helmi97/open-webui-extensions/blob/main/flapppy_bird/flapppy_bird.py then click **Import**
+3. Paste this url https://github.com/Helmi97/open-webui-extensions/blob/main/flappy_bird/flappy_bird.py then click **Import**
 
 ---
 
