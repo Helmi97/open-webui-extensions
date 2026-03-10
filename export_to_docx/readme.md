@@ -4,9 +4,9 @@ Export an assistant message to a `.docx` file using your own template.
 
 ## Features
 
-🎨 Use your own DOCX template hosted at any server-accessible URL
-🧾 Supports text, headings, lists, quotes, code blocks, tables, and images
-📊 Supports Mermaid diagrams rendered from the message and inserted into the document
+- 🎨 Use your own DOCX template hosted at any server-accessible URL
+- 🧾 Supports text, headings, lists, quotes, code blocks, tables, and images
+- 📊 Supports Mermaid diagrams rendered from the message and inserted into the document
 
 ## How it works
 
