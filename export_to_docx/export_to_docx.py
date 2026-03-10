@@ -33,7 +33,7 @@ class Action:
     class Valves(BaseModel):
         priority: int = Field(
             default=0,
-            description="ontrols button display order (lower = appears first)",
+            description="Controls button display order (lower = appears first)",
         )
 
         filename_prefix: str = Field(
