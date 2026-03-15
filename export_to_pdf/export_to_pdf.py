@@ -2,7 +2,7 @@
 title: Export Message to PDF
 author: Helmi Chaouachi
 git_url: https://github.com/Helmi97/open-webui-extensions/tree/main/export_to_pdf
-version: 1.0.0
+version: 1.2.0
 required_open_webui_version: 0.8.0
 icon_url: https://www.svgrepo.com/show/485376/pdf-file.svg
 requirements: weasyprint,markdown
@@ -23,29 +23,40 @@ from weasyprint import HTML
 
 DEFAULT_GLOBAL_CSS = r"""
 :root {
-  --text: #1f2937;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  --soft: #f9fafb;
-  --soft-2: #f3f4f6;
-  --code-bg: #111827;
-  --code-fg: #f9fafb;
-  --link: #2563eb;
-  --quote: #4b5563;
+  --text: #243244;
+  --heading: #0f172a;
+  --muted: #66758a;
+  --muted-strong: #475569;
+  --border: #d8e1eb;
+  --border-strong: #bcc9d8;
+  --surface: #f8fafc;
+  --surface-alt: #eef2f7;
+  --surface-elevated: #f4f7fb;
+  --code-bg: #0f172a;
+  --code-fg: #e2e8f0;
+  --link: #1d4ed8;
+  --quote: #475569;
+  --brand-strong: #0f2557;
   --brand: #1d4ed8;
+  --brand-accent: #38bdf8;
 }
 
 html {
-  font-size: 11pt;
+  font-size: 10.75pt;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
   padding: 0;
-  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: "Aptos", "Segoe UI", Roboto, Arial, sans-serif;
   color: var(--text);
   background: white;
   overflow-wrap: break-word;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -61,6 +72,11 @@ body {
   box-sizing: border-box;
 }
 
+strong,
+b {
+  color: var(--heading);
+}
+
 img, svg {
   max-width: 100%;
   height: auto;
@@ -69,253 +85,80 @@ img, svg {
 
 DEFAULT_FIRST_HEADER_HTML = r"""
 <div class="header-shell header-shell--first">
-  <div class="doc-header doc-header--first">
-    <div class="doc-header__topbar"></div>
-
-    <div class="doc-header__main">
-      <div class="doc-header__left">
-        <div class="doc-logo-slot">
-          <!-- Example:
-          <img class="doc-logo" src="data:image/png;base64,..." alt="Logo">
-          -->
-        </div>
-      </div>
-
-      <div class="doc-header__right">
-        <div class="doc-org-name">Your Company Name</div>
-        <div class="doc-org-tagline">Professional Document Export</div>
-        <div class="doc-org-meta">Street Address, ZIP City</div>
-        <div class="doc-org-meta">info@example.com | +00 000 000000</div>
-      </div>
-    </div>
-  </div>
+  <div class="doc-banner"></div>
 </div>
 """
 
 DEFAULT_OTHER_HEADER_HTML = r"""
-<div class="header-shell">
-  <div class="doc-header doc-header--other">
-    <div class="doc-header__main doc-header__main--compact">
-      <div class="doc-header__left">
-        <div class="doc-logo-slot doc-logo-slot--compact">
-          <!-- Example:
-          <img class="doc-logo doc-logo--compact" src="data:image/png;base64,..." alt="Logo">
-          -->
-        </div>
-      </div>
-
-      <div class="doc-header__right">
-        <div class="doc-org-name doc-org-name--compact">Your Company Name</div>
-        <div class="doc-org-meta">Assistant Message Export</div>
-      </div>
-    </div>
-  </div>
+<div class="header-shell header-shell--other">
+  <div class="doc-banner"></div>
 </div>
 """
 
 DEFAULT_FOOTER_HTML = r"""
 <div class="footer-shell">
   <div class="doc-footer">
-    <div class="doc-footer__left">
-      <div class="doc-footer__label">Document</div>
-      <div class="doc-footer__value">{{ export_title }}</div>
-    </div>
-
-    <div class="doc-footer__center">
-      <div class="doc-footer__label">{{ user_name }}</div>
-      <div class="doc-footer__value">{{ export_date }}</div>
-    </div>
-
-    <div class="doc-footer__right">
-      <div class="doc-footer__label">Page</div>
-      <div class="doc-footer__value page-number"></div>
-    </div>
+    <div class="doc-footer__left">{{ FILE_NAME }}</div>
+    <div class="doc-footer__center">Prepared {{ EXPORT_TIMESTAMP }}</div>
+    <div class="doc-footer__right page-number"></div>
   </div>
 </div>
 """
 
 DEFAULT_BODY_HTML_TEMPLATE = r"""
-<div class="document-body">
-  {{ body_content }}
+<div class="document-shell">
+  <div class="document-body">
+    {{ BODY_CONTENT }}
+  </div>
 </div>
 """
 
 DEFAULT_FIRST_HEADER_CSS = r"""
 .header-shell--first {
   width: var(--printable-width);
-  box-sizing: border-box;
   margin: 0 auto;
-  padding: 0 0 4mm 0;
+  padding: 0 0 1.8mm 0;
 }
 
-.doc-header {
+.header-shell--first .doc-banner {
   width: 100%;
-  box-sizing: border-box;
-}
-
-.doc-header__topbar {
-  height: 3.2mm;
-  width: 100%;
-  background: linear-gradient(90deg, var(--brand), #60a5fa);
-  border-radius: 1.2mm;
-  margin: 0 0 4mm 0;
-}
-
-.doc-header__main {
-  width: 100%;
-  display: table;
-  table-layout: fixed;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 3mm;
-}
-
-.doc-header__main--compact {
-  padding-bottom: 2mm;
-}
-
-.doc-header__left,
-.doc-header__right {
-  display: table-cell;
-  vertical-align: middle;
-}
-
-.doc-header__left {
-  width: 34mm;
-}
-
-.doc-header__right {
-  text-align: right;
-}
-
-.doc-logo-slot {
-  width: 28mm;
-  height: 16mm;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.doc-logo-slot--compact {
-  height: 11mm;
-}
-
-.doc-logo {
-  max-width: 28mm;
-  max-height: 16mm;
-  width: auto;
-  height: auto;
-  display: block;
-}
-
-.doc-logo--compact {
-  max-width: 22mm;
-  max-height: 11mm;
-}
-
-.doc-org-name {
-  font-size: 16pt;
-  font-weight: 700;
-  line-height: 1.15;
-  color: #0f172a;
-  margin: 0 0 1mm 0;
-  letter-spacing: 0.01em;
-}
-
-.doc-org-name--compact {
-  font-size: 11pt;
-  margin: 0;
-}
-
-.doc-org-tagline {
-  font-size: 9pt;
-  font-weight: 600;
-  color: var(--brand);
-  margin: 0 0 1.2mm 0;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.doc-org-meta {
-  font-size: 8.3pt;
-  color: var(--muted);
-  line-height: 1.35;
-  margin: 0.3mm 0;
+  height: 4.4mm;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--brand-strong) 0%,
+    var(--brand) 58%,
+    var(--brand-accent) 100%
+  );
+  box-shadow: 0 1.4mm 3.2mm rgba(15, 37, 87, 0.12);
 }
 """
 
 DEFAULT_OTHER_HEADER_CSS = r"""
-.header-shell {
+.header-shell--other {
   width: var(--printable-width);
-  box-sizing: border-box;
   margin: 0 auto;
-  padding: 0 0 2.5mm 0;
+  padding: 0 0 1.4mm 0;
 }
 
-.doc-header {
+.header-shell--other .doc-banner {
   width: 100%;
-  box-sizing: border-box;
-}
-
-.doc-header__main {
-  width: 100%;
-  display: table;
-  table-layout: fixed;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 2mm;
-}
-
-.doc-header__left,
-.doc-header__right {
-  display: table-cell;
-  vertical-align: middle;
-}
-
-.doc-header__left {
-  width: 28mm;
-}
-
-.doc-header__right {
-  text-align: right;
-}
-
-.doc-logo-slot {
-  width: 22mm;
-  height: 11mm;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.doc-logo {
-  max-width: 22mm;
-  max-height: 11mm;
-  width: auto;
-  height: auto;
-  display: block;
-}
-
-.doc-org-name {
-  font-size: 11pt;
-  font-weight: 700;
-  line-height: 1.15;
-  color: #0f172a;
-  margin: 0;
-}
-
-.doc-org-meta {
-  font-size: 8pt;
-  color: var(--muted);
-  line-height: 1.3;
-  margin: 0.4mm 0 0 0;
+  height: 3.2mm;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(15, 37, 87, 0.88) 0%,
+    rgba(29, 78, 216, 0.82) 58%,
+    rgba(56, 189, 248, 0.72) 100%
+  );
 }
 """
 
 DEFAULT_FOOTER_CSS = r"""
 .footer-shell {
   width: var(--printable-width);
-  box-sizing: border-box;
   margin: 0 auto;
-  padding: 2.5mm 0 0 0;
+  padding: 1.8mm 0 0 0;
 }
 
 .doc-footer {
@@ -324,19 +167,23 @@ DEFAULT_FOOTER_CSS = r"""
   table-layout: fixed;
   border-top: 1px solid var(--border);
   color: var(--muted);
-  font-size: 8.2pt;
-  padding-top: 2mm;
+  font-size: 8pt;
+  padding-top: 1.8mm;
 }
 
 .doc-footer__left,
 .doc-footer__center,
 .doc-footer__right {
   display: table-cell;
-  vertical-align: top;
+  vertical-align: middle;
+  line-height: 1.35;
 }
 
 .doc-footer__left {
+  width: 42%;
   text-align: left;
+  color: var(--heading);
+  word-break: break-word;
 }
 
 .doc-footer__center {
@@ -344,121 +191,134 @@ DEFAULT_FOOTER_CSS = r"""
 }
 
 .doc-footer__right {
+  width: 20%;
   text-align: right;
-}
-
-.doc-footer__label {
-  font-size: 7.2pt;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #94a3b8;
-  margin: 0 0 0.8mm 0;
-}
-
-.doc-footer__value {
-  font-size: 8.3pt;
-  color: var(--muted);
-  line-height: 1.3;
+  color: var(--muted-strong);
 }
 """
 
 DEFAULT_BODY_CSS = r"""
-.document-body {
-  padding: 15px;
+.document-shell {
   width: 100%;
-  box-sizing: border-box;
+  padding: 1.5mm 0 0 0;
+}
+
+.document-body {
+  width: 100%;
+  color: var(--text);
+}
+
+.document-body > :first-child {
+  margin-top: 0;
+}
+
+.document-body > :last-child {
+  margin-bottom: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: #111827;
-  line-height: 1.25;
-  margin-top: 1.35em;
-  margin-bottom: 0.55em;
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--heading);
+  line-height: 1.18;
+  margin-top: 1.25em;
+  margin-bottom: 0.45em;
   page-break-after: avoid;
   break-after: avoid;
 }
 
 h1 {
-  font-size: 24pt;
-  border-bottom: 2px solid var(--border);
-  padding-bottom: 0.2em;
+  font-size: 23pt;
+  letter-spacing: -0.02em;
+  padding-bottom: 0.18em;
+  border-bottom: 1.6px solid var(--border-strong);
   margin-top: 0;
 }
 
 h2 {
-  font-size: 18pt;
+  font-size: 17.5pt;
+  padding-bottom: 0.14em;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 0.15em;
 }
 
 h3 {
-  font-size: 15pt;
+  font-size: 14.5pt;
 }
 
 h4 {
-  font-size: 13pt;
+  font-size: 12.8pt;
 }
 
 p {
-  margin: 0.8em 0;
-  line-height: 1.65;
+  margin: 0 0 0.95em 0;
+  line-height: 1.68;
 }
 
 ul, ol {
-  margin: 0.8em 0 0.8em 1.4em;
+  margin: 0.4em 0 1em 1.35em;
   padding: 0;
 }
 
 li {
+  margin: 0.24em 0 0.24em 0.12em;
+  padding-left: 0.18em;
+}
+
+li > p {
   margin: 0.25em 0;
 }
 
 blockquote {
-  margin: 1em 0;
-  padding: 0.2em 0 0.2em 1em;
-  border-left: 4px solid #d1d5db;
+  margin: 1.1em 0;
+  padding: 0.7em 1em 0.7em 1.1em;
+  border-left: 3px solid var(--brand);
+  border-radius: 0 10px 10px 0;
   color: var(--quote);
-  background: #fcfcfd;
+  background: linear-gradient(180deg, #fbfcff 0%, #f5f8fc 100%);
 }
 
 hr {
   border: none;
   border-top: 1px solid var(--border);
-  margin: 1.6em 0;
+  margin: 1.8em 0 1.5em;
 }
 
 a {
   color: var(--link);
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: rgba(29, 78, 216, 0.35);
+  text-underline-offset: 0.14em;
   word-break: break-word;
 }
 
 code {
   font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
   font-size: 0.92em;
-  background: var(--soft-2);
-  border-radius: 4px;
+  color: var(--heading);
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 5px;
   padding: 0.14em 0.36em;
   white-space: break-spaces;
 }
 
 pre {
-  background: var(--code-bg);
+  background: linear-gradient(180deg, #0f172a 0%, #111c32 100%);
   color: var(--code-fg);
-  border-radius: 10px;
+  border: 1px solid #172554;
+  border-radius: 12px;
   padding: 14px 16px;
   overflow: hidden;
   white-space: pre-wrap;
   word-break: break-word;
   page-break-inside: avoid;
   break-inside: avoid;
-  margin: 1em 0;
+  margin: 1.1em 0;
 }
 
 pre code {
   background: transparent;
   color: inherit;
+  border: none;
   padding: 0;
   border-radius: 0;
   font-size: 0.9em;
@@ -467,8 +327,8 @@ pre code {
 table {
   width: 100%;
   border-collapse: collapse;
-  margin: 1em 0;
-  font-size: 10.3pt;
+  margin: 1.15em 0 1.4em;
+  font-size: 10.1pt;
 }
 
 th, td {
@@ -479,12 +339,17 @@ th, td {
 }
 
 th {
-  background: var(--soft);
-  font-weight: 600;
+  background: #f6f8fb;
+  color: var(--heading);
+  font-weight: 700;
 }
 
 tr:nth-child(even) td {
-  background: #fcfcfc;
+  background: #fafbfc;
+}
+
+.document-body img {
+  border-radius: 10px;
 }
 
 .mermaid-diagram {
@@ -493,9 +358,9 @@ tr:nth-child(even) td {
   page-break-inside: avoid;
   break-inside: avoid;
   border: 1px solid var(--border);
-  border-radius: 10px;
-  background: white;
-  padding: 0;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  padding: 10px;
   overflow: hidden;
 }
 
@@ -504,13 +369,14 @@ tr:nth-child(even) td {
   height: auto;
   display: block;
   margin: 0 auto;
+  border-radius: 8px;
 }
 
 .mermaid-error {
-  border: 1px solid #fca5a5;
-  background: #fef2f2;
+  border: 1px solid #f8b4b4;
+  background: #fff5f5;
   border-radius: 10px;
-  padding: 12px;
+  padding: 12px 14px;
   margin: 1em 0;
   page-break-inside: avoid;
   break-inside: avoid;
@@ -530,23 +396,23 @@ tr:nth-child(even) td {
 }
 
 .toc {
-  background: var(--soft);
+  background: linear-gradient(180deg, #fbfcff 0%, #f6f9fc 100%);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 12px 14px;
   margin: 1em 0 1.5em 0;
 }
 
 .toc ul {
-  margin: 0.5em 0 0 1.2em;
+  margin: 0.6em 0 0 1.2em;
 }
 
 .admonition {
   border: 1px solid var(--border);
-  border-left: 4px solid #60a5fa;
+  border-left: 4px solid var(--brand);
   background: #f8fbff;
-  border-radius: 8px;
-  padding: 10px 12px;
+  border-radius: 10px;
+  padding: 11px 13px;
   margin: 1em 0;
   page-break-inside: avoid;
   break-inside: avoid;
@@ -554,7 +420,8 @@ tr:nth-child(even) td {
 
 .admonition-title {
   font-weight: 700;
-  margin-bottom: 0.4em;
+  color: var(--heading);
+  margin-bottom: 0.45em;
 }
 """
 
@@ -577,23 +444,23 @@ class Action:
         )
 
         first_header_height_mm: int = Field(
-            default=28,
+            default=8,
             description="Reserved height in millimeters for the first page header. Increase this if the first header is taller.",
         )
 
         other_header_height_mm: int = Field(
-            default=20,
+            default=6,
             description="Reserved height in millimeters for headers on pages after the first page. If left smaller than the actual header, overlap can happen.",
         )
 
         footer_height_mm: int = Field(
-            default=18,
+            default=12,
             description="Reserved height in millimeters for the repeating footer.",
         )
 
         show_page_numbers: bool = Field(
             default=False,
-            description="If enabled, page numbers are available as the {{ page_number }} placeholder. Keep this off if you do not want page numbers.",
+            description="If enabled, page numbers are available via {{ PAGE_NUMBER }}, {{ PAGE }}, {{ PAGES }}, their lowercase aliases, and the .page-number CSS helper. Keep this off if you do not want page numbers.",
         )
 
         mermaid_scale: int = Field(
@@ -618,7 +485,7 @@ class Action:
 
         first_header_html: str = Field(
             default=DEFAULT_FIRST_HEADER_HTML,
-            description="HTML fragment for the first page header. This can contain logos, branding, address blocks, and any static markup. Placeholders like {{ export_title }} and {{ export_date }} are supported.",
+            description="HTML fragment for the first page header. This can contain logos, titles, document context, and any static markup. Built-in placeholders such as {{ EXPORT_TITLE }}, {{ EXPORT_DATE }}, and {{ USER_NAME }} are filled automatically, and any extra placeholders are prompted at export time.",
         )
         first_header_css: str = Field(
             default=DEFAULT_FIRST_HEADER_CSS,
@@ -627,7 +494,7 @@ class Action:
 
         other_header_html: str = Field(
             default=DEFAULT_OTHER_HEADER_HTML,
-            description="HTML fragment for headers on pages after the first page. If left empty, the first page header HTML is reused.",
+            description="HTML fragment for headers on pages after the first page. If left empty, the first page header HTML is reused. Built-in placeholders are filled automatically, and any extra placeholders are prompted at export time.",
         )
         other_header_css: str = Field(
             default=DEFAULT_OTHER_HEADER_CSS,
@@ -636,7 +503,7 @@ class Action:
 
         footer_html: str = Field(
             default=DEFAULT_FOOTER_HTML,
-            description="HTML fragment for the repeating footer. Placeholders like {{ page_number }}, {{ export_date }}, and {{ message_id }} are supported.",
+            description="HTML fragment for the repeating footer. Built-in placeholders such as {{ PAGE_NUMBER }}, {{ EXPORT_DATE }}, {{ FILE_NAME }}, and {{ MESSAGE_ID }} are filled automatically, and any extra placeholders are prompted at export time.",
         )
         footer_css: str = Field(
             default=DEFAULT_FOOTER_CSS,
@@ -645,7 +512,7 @@ class Action:
 
         body_html_template: str = Field(
             default=DEFAULT_BODY_HTML_TEMPLATE,
-            description="HTML template for the document body. It must include {{ body_content }} where the rendered markdown should be inserted.",
+            description="HTML template for the document body. It must include {{ BODY_CONTENT }} or {{ body_content }} where the rendered markdown should be inserted. Built-in placeholders are filled automatically, and any extra placeholders are prompted at export time.",
         )
         body_css: str = Field(
             default=DEFAULT_BODY_CSS,
@@ -767,6 +634,73 @@ class Action:
                 return self._normalize_content(message.get("content"))
 
         return ""
+
+    def get_builtin_placeholder_names(self) -> set[str]:
+        canonical = {
+            "BODY_CONTENT",
+            "EXPORT_DATE",
+            "EXPORT_TIME",
+            "EXPORT_TIMESTAMP",
+            "EXPORT_TITLE",
+            "FILE_NAME",
+            "MESSAGE_ID",
+            "PAGE",
+            "PAGE_NUMBER",
+            "PAGES",
+            "USER_NAME",
+        }
+        return canonical | {name.lower() for name in canonical}
+
+    def extract_placeholders_from_templates(self) -> list[str]:
+        names: set[str] = set()
+        pattern = re.compile(r"\{\{\s*([A-Za-z][A-Za-z0-9_]*)\s*\}\}")
+        templates = [
+            self.valves.first_header_html,
+            self.valves.other_header_html,
+            self.valves.footer_html,
+            self.valves.body_html_template,
+        ]
+
+        for template in templates:
+            for match in pattern.finditer(template or ""):
+                names.add(match.group(1).strip())
+
+        return sorted(names)
+
+    def placeholder_to_label(self, name: str) -> str:
+        return name.replace("_", " ").strip().capitalize()
+
+    async def prompt_for_custom_placeholders(
+        self,
+        placeholder_names: list[str],
+        __event_call__=None,
+    ) -> dict[str, str]:
+        values: dict[str, str] = {}
+
+        if __event_call__ is None:
+            for name in placeholder_names:
+                values[name] = ""
+            return values
+
+        for name in placeholder_names:
+            response = await __event_call__(
+                {
+                    "type": "input",
+                    "data": {
+                        "title": self.placeholder_to_label(name),
+                        "message": f"Enter a value for {name}:",
+                        "placeholder": self.placeholder_to_label(name),
+                    },
+                }
+            )
+
+            value = response
+            if isinstance(response, dict):
+                value = response.get("value", "")
+
+            values[name] = str(value or "")
+
+        return values
 
     def build_extract_mermaid_png_js(self, message_id: str) -> str:
         scale = self.valves.mermaid_scale
@@ -1000,8 +934,66 @@ return {{
             result = result.replace(f"{{{{{key}}}}}", value)
         return result
 
+    def build_template_context(
+        self,
+        rendered_body_markdown: str,
+        file_name: str,
+        message_id: str,
+        user_name: str,
+        custom_placeholders: Optional[dict[str, str]] = None,
+    ) -> dict[str, str]:
+        now = datetime.now()
+        export_date = now.strftime("%Y-%m-%d")
+        export_time = now.strftime("%H:%M")
+        export_timestamp = f"{export_date} {export_time}"
+        export_title = "Conversation Export"
+        page_number_markup = (
+            '<span class="page-number"></span>' if self.valves.show_page_numbers else ""
+        )
+        page_markup = (
+            '<span class="page-current"></span>' if self.valves.show_page_numbers else ""
+        )
+        pages_markup = (
+            '<span class="page-total"></span>' if self.valves.show_page_numbers else ""
+        )
+
+        context = {
+            "BODY_CONTENT": rendered_body_markdown,
+            "body_content": rendered_body_markdown,
+            "EXPORT_DATE": html.escape(export_date),
+            "export_date": html.escape(export_timestamp),
+            "EXPORT_TIME": html.escape(export_time),
+            "export_time": html.escape(export_time),
+            "EXPORT_TIMESTAMP": html.escape(export_timestamp),
+            "export_timestamp": html.escape(export_timestamp),
+            "EXPORT_TITLE": html.escape(export_title),
+            "export_title": html.escape(export_title),
+            "FILE_NAME": html.escape(file_name),
+            "file_name": html.escape(file_name),
+            "MESSAGE_ID": html.escape(message_id),
+            "message_id": html.escape(message_id),
+            "PAGE_NUMBER": page_number_markup,
+            "page_number": page_number_markup,
+            "PAGE": page_markup,
+            "page": page_markup,
+            "PAGES": pages_markup,
+            "pages": pages_markup,
+            "USER_NAME": html.escape(user_name),
+            "user_name": html.escape(user_name),
+        }
+
+        for key, value in (custom_placeholders or {}).items():
+            context[key] = html.escape(value or "")
+
+        return context
+
     def build_html_document(
-        self, markdown_text: str, message_id: str, user_name: str = ""
+        self,
+        markdown_text: str,
+        message_id: str,
+        file_name: str,
+        user_name: str = "",
+        custom_placeholders: Optional[dict[str, str]] = None,
     ) -> str:
         rendered_body_markdown = markdown.markdown(
             markdown_text,
@@ -1017,24 +1009,13 @@ return {{
             ],
             output_format="html5",
         )
-
-        now_str = datetime.now().strftime("%Y-%m-%d %H:%M")
-        page_number_text = (
-            "Page counter(page) / counter(pages)"
-            if self.valves.show_page_numbers
-            else ""
+        context = self.build_template_context(
+            rendered_body_markdown=rendered_body_markdown,
+            file_name=file_name,
+            message_id=message_id,
+            user_name=user_name,
+            custom_placeholders=custom_placeholders,
         )
-
-        context = {
-            "body_content": rendered_body_markdown,
-            "message_id": html.escape(message_id),
-            "export_title": "Assistant Message Export",
-            "export_date": html.escape(now_str),
-            "page_number": html.escape(page_number_text),
-            "page": "counter(page)",
-            "pages": "counter(pages)",
-            "user_name": html.escape(user_name),
-        }
 
         first_header_html = self.render_template(self.valves.first_header_html, context)
         other_header_html_raw = (
@@ -1055,12 +1036,22 @@ return {{
 
         page_width_mm = self.get_page_width_mm()
         printable_width_mm = max(10.0, page_width_mm - (2 * margin))
+        page_number_css = (
+            '"Page " counter(page) " / " counter(pages)"'
+            if self.valves.show_page_numbers
+            else '""'
+        )
+        page_current_css = "counter(page)" if self.valves.show_page_numbers else '""'
+        page_total_css = (
+            "counter(pages)" if self.valves.show_page_numbers else '""'
+        )
+        document_title = context["EXPORT_TITLE"]
 
         return f"""<!doctype html>
     <html>
     <head>
       <meta charset="utf-8">
-      <title>Assistant Message Export</title>
+      <title>{document_title}</title>
       <style>
         @page {{
           size: {self.valves.page_size};
@@ -1125,7 +1116,15 @@ return {{
     {self.valves.global_css}
     
         .page-number::after {{
-          content: "Page " counter(page) " / " counter(pages);
+          content: {page_number_css};
+        }}
+
+        .page-current::after {{
+          content: {page_current_css};
+        }}
+
+        .page-total::after {{
+          content: {page_total_css};
         }}
     
     {self.valves.first_header_css}
@@ -1158,10 +1157,19 @@ return {{
     """
 
     def md_to_pdf(
-        self, markdown_text: str, message_id: str, user_name: str = ""
+        self,
+        markdown_text: str,
+        message_id: str,
+        file_name: str,
+        user_name: str = "",
+        custom_placeholders: Optional[dict[str, str]] = None,
     ) -> bytes:
         html_doc = self.build_html_document(
-            markdown_text, message_id, user_name=user_name
+            markdown_text,
+            message_id,
+            file_name=file_name,
+            user_name=user_name,
+            custom_placeholders=custom_placeholders,
         )
         return HTML(string=html_doc).write_pdf()
 
@@ -1252,6 +1260,25 @@ return {{ success: true, filename, size: bytes.length }};
                 )
             return {"content": "No assistant message content found."}
 
+        user_name = ""
+        if isinstance(__user__, dict):
+            user_name = (__user__.get("name") or "").strip()
+
+        filename = await self.prompt_filename(
+            message_id=message_id,
+            __event_call__=__event_call__,
+        )
+
+        all_placeholders = self.extract_placeholders_from_templates()
+        builtin_placeholders = self.get_builtin_placeholder_names()
+        custom_placeholder_names = [
+            name for name in all_placeholders if name not in builtin_placeholders
+        ]
+        custom_placeholders = await self.prompt_for_custom_placeholders(
+            custom_placeholder_names,
+            __event_call__=__event_call__,
+        )
+
         if __event_emitter__:
             await __event_emitter__(
                 {
@@ -1307,14 +1334,12 @@ return {{ success: true, filename, size: bytes.length }};
             )
 
         try:
-            user_name = ""
-            if isinstance(__user__, dict):
-                user_name = (__user__.get("name") or "").strip()
-
             pdf_bytes = self.md_to_pdf(
                 merged_markdown,
                 message_id=message_id,
+                file_name=filename,
                 user_name=user_name,
+                custom_placeholders=custom_placeholders,
             )
         except Exception as e:
             if __event_emitter__:
@@ -1329,11 +1354,6 @@ return {{ success: true, filename, size: bytes.length }};
                 "mermaid_extract_result": extract_result,
                 "mermaid_extract_error": extract_error,
             }
-
-        filename = await self.prompt_filename(
-            message_id=message_id,
-            __event_call__=__event_call__,
-        )
 
         if __event_emitter__:
             await __event_emitter__(
@@ -1361,6 +1381,7 @@ return {{ success: true, filename, size: bytes.length }};
         return {
             "content": f"Exported message to PDF: {filename}",
             "result": result,
+            "custom_placeholders": custom_placeholders,
             "mermaid_diagrams_embedded": len(diagrams),
             "mermaid_extract_result": extract_result,
             "mermaid_extract_error": extract_error,

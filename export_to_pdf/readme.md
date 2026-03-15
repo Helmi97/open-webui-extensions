@@ -11,6 +11,7 @@ Turn an assistant message in Open WebUI into a polished PDF with selectable text
 - 🎨 **Customizable headers (HTML + CSS)**
 - 🎨 **Customizable footer (HTML + CSS)**
 - 🎨 **Customizable body template (HTML + CSS)**
+- 🧩 **Built-in placeholders plus prompted custom placeholders**
 
 ---
 
@@ -47,30 +48,48 @@ Turn an assistant message in Open WebUI into a polished PDF with selectable text
 | `other_header_css` | CSS for later headers | Any valid CSS string, or empty string to reuse first header CSS |
 | `footer_html` | HTML for footer | Any valid HTML fragment. Supports placeholders  |
 | `footer_css` | CSS for footer | Any valid CSS string. Use for metadata, page number layout, etc. |
-| `body_html_template` | Wrapper HTML for body content | Any valid HTML fragment, but it must include `{{ body_content }}` |
+| `body_html_template` | Wrapper HTML for body content | Any valid HTML fragment, but it must include `{{ BODY_CONTENT }}` or `{{ body_content }}` |
 | `body_css` | CSS for body area | Any valid CSS string. Controls body typography and content styling |
 
 ---
 
 ## 🔤 Available placeholders
 
-You can use these inside header, footer, and body templates:
+You can use these inside `first_header_html`, `other_header_html`, `footer_html`, and `body_html_template`.
 
-| Placeholder          | Meaning                                       |
-| -------------------- | --------------------------------------------- |
-| `{{ body_content }}` | Rendered assistant markdown HTML              |
-| `{{ message_id }}`   | Current message id                            |
-| `{{ export_title }}` | Export title                                  |
-| `{{ export_date }}`  | Export timestamp                              |
-| `{{ user_name }}`    | Current user name from `__user__.get("name")` |
-| `{{ page_number }}`  | Placeholder text for page numbering           |
-| `{{ page }}`         | `counter(page)` token text                    |
-| `{{ pages }}`        | `counter(pages)` token text                   |
+### Built-in placeholders
+
+These are filled automatically:
+
+- `{{ FILE_NAME }}`
+- `{{ EXPORT_DATE }}`
+- `{{ EXPORT_TIME }}`
+- `{{ EXPORT_TIMESTAMP }}`
+- `{{ USER_NAME }}`
+- `{{ MESSAGE_ID }}`
+- `{{ EXPORT_TITLE }}`
+- `{{ BODY_CONTENT }}`
+- `{{ PAGE_NUMBER }}`
+- `{{ PAGE }}`
+- `{{ PAGES }}`
+
+Lowercase aliases remain supported for backward compatibility, for example `{{ body_content }}` and `{{ export_date }}`.
+
+### Custom placeholders
+
+You can add your own placeholders, for example:
+
+- `{{ CLIENT_NAME }}`
+- `{{ PROJECT_NAME }}`
+- `{{ REVIEWER }}`
+
+When exporting, the action scans the HTML template fragments, detects extra placeholders, and prompts the user for values.
 
 ### 📌 Notes
 
-* `body_html_template` **must** contain `{{ body_content }}`
-* real page numbers are best shown with:
+* `body_html_template` **must** contain `{{ BODY_CONTENT }}` or `{{ body_content }}`
+* `{{ PAGE_NUMBER }}`, `{{ PAGE }}`, and `{{ PAGES }}` render working page counter markup in HTML templates
+* real page numbers can also be shown with:
 
 ```html
 <div class="page-number"></div>
@@ -142,8 +161,8 @@ Use:
 Example footer snippet:
 
 ```html
-<div class="doc-footer__left">{{ user_name }}</div>
-<div class="doc-footer__center">{{ export_date }}</div>
+<div class="doc-footer__left">{{ USER_NAME }}</div>
+<div class="doc-footer__center">{{ EXPORT_TIMESTAMP }}</div>
 <div class="doc-footer__right page-number"></div>
 ```
 
@@ -181,7 +200,7 @@ Example:
 ```html
 <div class="document-body">
   <div class="report-frame">
-    {{ body_content }}
+    {{ BODY_CONTENT }}
   </div>
 </div>
 ```
