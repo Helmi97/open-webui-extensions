@@ -6,6 +6,7 @@ author: Helmi Chaouachi
 git_url: https://github.com/Helmi97/open-webui-extensions/tree/main/export_to_excel
 required_open_webui_version: 0.8.0
 requirements: openpyxl,markdown,beautifulsoup4
+icon_url: https://www.svgrepo.com/show/373590/excel2.svg
 """
 
 from __future__ import annotations
