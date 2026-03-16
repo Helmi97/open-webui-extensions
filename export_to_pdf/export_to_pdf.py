@@ -428,6 +428,11 @@ tr:nth-child(even) td {
 
 class Action:
     class Valves(BaseModel):
+        priority: int = Field(
+            default=0,
+            description="Controls button display order (lower = appears first).",
+        )
+        
         filename_prefix: str = Field(
             default="message",
             description="File name prefix used for the downloaded PDF.",
