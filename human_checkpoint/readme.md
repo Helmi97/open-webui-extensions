@@ -30,54 +30,6 @@ It takes a JSON Schema at runtime, renders the form with [Jedison](https://germa
 4. Save it.
 5. Configure the valves as needed.
 
-## Runtime Contract
-
-The tool is intentionally minimal at call time:
-
-```json
-{
-  "schema": {
-    "title": "Database Credentials",
-    "description": "Provide the connection settings for the import job.",
-    "type": "object",
-    "properties": {
-      "host": {
-        "type": "string",
-        "title": "Host"
-      },
-      "port": {
-        "type": "integer",
-        "title": "Port",
-        "default": 5432,
-        "minimum": 1,
-        "maximum": 65535
-      },
-      "username": {
-        "type": "string",
-        "title": "Username"
-      },
-      "password": {
-        "type": "string",
-        "title": "Password"
-      },
-      "ssl": {
-        "type": "boolean",
-        "title": "Use SSL",
-        "default": true
-      }
-    },
-    "required": ["host", "username", "password"]
-  }
-}
-```
-
-Guidance:
-
-- Put labels, descriptions, defaults, enums, and validation rules in the schema.
-- Keep stable UI settings in valves, not in the tool call.
-- Prefer one complete schema over several back-and-forth prompts.
-- Password masking depends on the schema conventions Jedison supports for that field type.
-
 ## Valves
 
 | Valve | Default | Purpose |
