@@ -1,6 +1,6 @@
 # Human Checkpoint
 
-`human_checkpoint` is an Open WebUI Tool that lets the model request structured human input through a browser modal instead of another free-form chat turn.
+`human_checkpoint` is an Open WebUI Tool that lets the model request structured human input through a browser modal instead of another chat turn.
 
 It takes a JSON Schema at runtime, renders the form with [Jedison](https://germanbisurgi.github.io/jedison-docs/) in the user's browser, waits for submit, cancel, or timeout, and returns a structured JSON result back to the tool call.
 
